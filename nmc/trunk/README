@@ -1,0 +1,14 @@
+NanoMaterials Config.
+--------------------
+
+(c) Sergio Davis - http://www.gnm.cl/sdavis
+
+This program is used to read a packagesetup file and generate the
+necessary Makefiles.
+
+Version for Python 2.0 
+setup-p2.py
+
+Version for Python 3.0
+setup-p3.py
+
