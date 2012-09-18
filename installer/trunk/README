@@ -1,0 +1,4 @@
+Version 0.8.4
+-Cambio temporal de puerto de 6054 a 56737
+-Opciones -c & --compiler setean el compilador. En particular : -c intel
+-Opciones -o & --openmp asignan compilacion usando flags de openmp.
