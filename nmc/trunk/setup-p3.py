@@ -8,6 +8,7 @@ from copy import deepcopy
 #
 defaultPrefix = '/usr/local'
 defaultInstall = 'install'
+pythonlib = [x for x in sys.path if 'python%d.%d' % (sys.version_info[0:2]) in x and 'pymodules' not in x][0]
 
 defaultLanguages = ['c', 'c++', 'd', 'python', 'lpunit', 'plugcode']
 
@@ -21,7 +22,10 @@ languageCompilation = { 'c++': '%(compiler)s %(compilerflags)s -c %(source)s -o 
                         'lpunit': '%(compiler)s %(source)s - | %(cpp_compiler)s %(compilerflags)s -x c++ -c -o %(object)s -',
                         'plugcode': '%(compiler)s %(source)s - | %(c_compiler)s %(compilerflags)s -x c -c -o %(object)s -' }
 
-languageStaticLibraryPacking  = 'ar rcs %(target)s %(object)s'
+languageStaticLibraryPacking  = { 'c++': 'ar rcs %(target)s %(object)s',
+                                  'c': 'ar rcs %(target)s %(object)s',
+                                  'd': 'ar rcs %(target)s %(object)s',
+                                  'lpunit': 'ar rcs %(target)s %(object)s' }
 
 openmpFlags = None
 languageLinking = None
@@ -35,7 +39,7 @@ librarySharedLinkerFlags = None
 moduleSharedFlags = None 
 moduleSharedLinkerFlags = None 
 
-languageFields =  ['flags', 'libraries', 'compiler', 'linker']
+languageFields =  ['flags', 'libraries', 'compiler', 'linker', 'openmpflags']
 targetFields = ['test', 'language', 'sources', 'headers', 'installpath', 'pkgconfig', 'expand', 'version', 'openmp'] + languageFields
 targetKinds = ['binary', 'script', 'library', 'staticlibrary', 'headers', 'module', 'file']
 globaltags = ['name', 'fullname', 'version', 'author', 'prefix', 'openmp', 'mainfirst']
@@ -154,8 +158,7 @@ class Language(Item):
                   includedname = remainder[1:-1]
                   if includedname not in inc: 
                      for d in includedirs: 
-                         if os.path.exists(os.path.join(d, includedname)): 
-                            inc.append(os.path.join(os.path.abspath(d), includedname))
+                         if os.path.exists(os.path.join(d, includedname)): inc.append(os.path.join(d, includedname))
                else: assert False
         return inc
  
@@ -437,7 +440,7 @@ class Directory(dict):
                     #
                     # Build static libraries
                     #
-                    lapply = self[t].language.Apply(languageStaticLibraryPacking, self[t], objects=objlist)
+                    lapply = self[t].language.Apply(languageStaticLibraryPacking[self[t].language.name], self[t], objects=objlist)
                     if lapply != None: mf += ('\t'+lapply+'\n\n')
                     #
                  for obj in objlist:
@@ -486,6 +489,9 @@ class SetupHandler:
         self.librarypath = []
         self.AddToLibraryPath('/usr/local/lib')
         self.AddToLibraryPath('/usr/lib')
+        for thing in os.listdir('/usr/lib'):
+            dirthing = os.path.join('/usr/lib', thing)
+            if os.path.isdir(dirthing): self.AddToLibraryPath(dirthing)
         for lang in defaultLanguages: self.language[lang] = Language(lang, self)
         self.ParsePackageSetup(psetup, options)
         self.fulloptions = options.fulloptions 
@@ -581,24 +587,50 @@ class SetupHandler:
                self.linebuffer[i] = z.replace('`%s`' % z[p0+1:p1], OutputFromCommand(z[p0+1:p1]))
 
     def ExpandConditionals(self, options):
+        x = [w for w in self.linebuffer if 'ifdef' in w]
+        if len(x) == 0: return False
+        #
+        def ReadUntilFindPair():
+            level, buf = 0, list()
+            while len(self.linebuffer) > 0:
+                  z = self.linebuffer.pop(0).strip()
+                  if level == 0 and ('endif' in z or 'else' in z):
+                     self.linebuffer.insert(0, z)
+                     return buf
+                  if 'ifdef' in z: level += 1
+                  elif 'endif' in z: level -= 1
+                  buf.append(z)
+            raise Exception('Malformed ifdef/else/endif statement')
+        #
         lbuf, inside_cond, consider_cond = list(), False, False
-        for z in self.linebuffer:
-            if z.startswith('ifdef '):
-               inside_cond, condition = True, z.split()[1]
-               consider_cond = (condition in options)
-            elif z.startswith('else'):
-               consider_cond = not consider_cond 
-            elif z.startswith('endif'):
-               inside_cond = False
-               continue
-            elif not inside_cond: lbuf.append(z)
-            elif inside_cond and consider_cond: lbuf.append(z)
+        condition = None
+        while len(self.linebuffer) > 0:
+              z = self.linebuffer.pop(0).strip()
+              if z.startswith('ifdef '):
+                 inside_cond, condition = True, z.split()[1]
+                 consider_cond = (condition in options)
+                 buf = ReadUntilFindPair()
+                 if consider_cond:
+                    for line in buf: lbuf.append(line)
+              elif z.startswith('else'):
+                 consider_cond = not consider_cond 
+                 buf = ReadUntilFindPair()
+                 if consider_cond: # Ojo, la condicion se invirtio antes!
+                    for line in buf: lbuf.append(line)
+              elif z.startswith('endif'):
+                 inside_cond = False
+                 continue
+              elif not inside_cond: lbuf.append(z)
+              elif inside_cond and consider_cond: lbuf.append(z)
         self.linebuffer = lbuf
+        return True
 
     def ParsePackageSetup(self, psetup, options):
         self.linebuffer = self.ReadLineBuffer(psetup)
         self.ExpandBackquotes()
-        self.ExpandConditionals(options)
+        while self.ExpandConditionals(options): pass
+        for i, line in enumerate(self.linebuffer):
+            self.linebuffer[i] = ExpandVariables(line, options)
         self.block = self.ParseBlock()
         for tag in globaltags: 
             if tag in self.block: setattr(self, tag, self.block[tag])
@@ -619,7 +651,7 @@ class SetupHandler:
     def CreateMakefile(self, d, subdirs):
         mf = d.RenderMakefile(subdirs)
         mfname = os.path.join(d.name, 'Makefile')
-        print('   ->', mfname) 
+        print('   ->', mfname)
         open(mfname, 'w').write(mf)
 
     def CheckPlatform(self):
@@ -666,21 +698,17 @@ class SetupHandler:
                    if 'ldconfig' not in utilitylist: utilitylist.append('ldconfig')
         return utilitylist
 
-    def HaveExecutable(self, ex):
+    def HaveExecutable(self, ex): 
         sys.stdout.write('   '+ex+' ')
-        expath = os.popen('which %s' % ex, 'r').readline().strip()
+        expath = os.popen('PATH=/sbin:$PATH which %s' % ex, 'r').readline().strip()
         if (expath != ''):
            print('->', expath)
            return os.path.abspath(expath)
-        else:
-           expath = os.path.join(os.getcwd(), ex)
-           if os.path.exists(expath):
-              print('->', expath)
-              return expath
+        else: 
            sys.stdout.write('NOT FOUND\n')
            return None
 
-    def HaveLibrary(self, library): 
+    def HaveLibrary(self, library):
         sys.stdout.write('   '+library+' ')
         st = False
         for lpath in self.LibraryPath():
@@ -690,7 +718,11 @@ class SetupHandler:
                    st = True
                    break
             if st: break
-        if not st: sys.stdout.write('NOT FOUND\n')
+        if not st:
+           if library in ('libdl', 'libm'):
+              sys.stdout.write('not found (IGNORED)\n')
+              st = True
+           else: sys.stdout.write('NOT FOUND\n')
         return st
 
     def HavePkgConfigLibrary(self, pc):
@@ -709,6 +741,7 @@ class SetupHandler:
     def Setup(self):
         if not hasattr(self, 'debug'): self.debug = False
         if self.debug: sys.stdout.write('* IN DEBUG MODE\n')
+        self.actualpath = { }
         sys.stdout.write('* Configuring package %s version %s\n\n' % (self.name, self.version))
         sys.stdout.write('* Using installation directory: %s\n\n' % self.prefix)
         sys.stdout.write('* Checking for sources: ')
@@ -772,10 +805,12 @@ class OptionParser(dict):
                if '=' in option_name: self[option_name.split('=')[0]] = '='.join(option_name.split('=')[1:])
                else: self[option_name] = True 
 
-def ExpandVariables(d):
-    buffer = sys.stdin.read()
-    for key in d: buffer = buffer.replace('$('+key+')', d[key])
-    sys.stdout.write(buffer)
+def ExpandVariables(buffer, d):
+    for key in d: buffer = buffer.replace('$('+key+')', str(d[key]))
+    # Begin automatic variables
+    buffer = buffer.replace('$(PYTHONLIB)', pythonlib)
+    # End of automatic variables
+    return buffer
 
 def ShowHelp():
     sys.stdout.write('Usage: setup [OPTIONS]\n\n')
@@ -788,11 +823,12 @@ def ShowHelp():
 #
 #
 if __name__ == '__main__':
-#   try:
+   try:
       opt = OptionParser(sys.argv)
-      if 'expand' in opt: ExpandVariables(dict([x.split('=') for x in opt['expand'].split(',')]))
+      if 'expand' in opt:
+         sys.stdout.write(ExpandVariables(sys.stdin.read(), dict([x.split('=') for x in opt['expand'].split(',')])))
       elif 'help' in opt: ShowHelp()
       else: SetupHandler('packagesetup', opt).Setup()
-#   except Exception as e: 
-#      print('\n', e)
+   except Exception as e:
+      print('\n', e)
 
