@@ -1,51 +1,97 @@
 " Vim syntax file
-" Language: LPMD plugin code
+" Language: LPMD plugcode file code
 " Maintainer: GNM <gnm@gnm.cl>
+" Filename: *.plugcode
 " Latest Revision: September 24th 2012
 
-if exists("b:current_syntax")
-  finish
+" Initialization
+" ==============
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+if version < 600
+  syntax clear
+elseif exists("b:current_syntax")
+    finish
 endif
 
+let s:cpo_save = &cpo
+set cpo&vim
+
+"Ignore case
+syn case ignore
+
+"------------------------------------------------------------"
+" Numerical information for control files                    "
+"------------------------------------------------------------"
+
 " Integer with - + or nothing in front
-syn match lpplugcodeNumber '\d\+'
-syn match lpplugcodeNumber '[-+]\d\+'
-
+syn match lpplugcodeNumber contained '\d\+'
+syn match lpplugcodeNumber contained '[-+]\d\+'
 " Floating point number with decimal no E or e (+,-)
-syn match lpplugcodeNumber '\d\+\.\d*'
-syn match lpplugcodeNumber '[-+]\d\+\.\d*'
-
+syn match lpplugcodeNumber contained '\d\+\.\d*'
+syn match lpplugcodeNumber contained '[-+]\d\+\.\d*'
 " Floating point like number with E and no decimal point (+,-)
-syn match lpplugcodeNumber '[-+]\=\d[[:digit:]]*[eE][\-+]\=\d\+'
-syn match lpplugcodeNumber '\d[[:digit:]]*[eE][\-+]\=\d\+'
-
+syn match lpplugcodeNumber contained '[-+]\=\d[[:digit:]]*[eE][\-+]\=\d\+'
+syn match lpplugcodeNumber contained '\d[[:digit:]]*[eE][\-+]\=\d\+'
 " Floating point like number with E and decimal point (+,-)
-syn match lpplugcodeNumber '[-+]\=\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
-syn match lpplugcodeNumber '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
+syn match lpplugcodeNumber contained '[-+]\=\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
+syn match lpplugcodeNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 
-"Keywords
-syn keyword lpplugcodeLanguageKeywords @plugin @version @author
+"------------------------------------------------------------"
+" Keywords control files                                     "
+"------------------------------------------------------------"
 
-"Regions
-syn region lpplugcodeDescBlock start="@example" end="@end" fold transparent
+syn keyword lpplugcodeMainKw contained cell input output steps monitor average 
+syn keyword lpplugcodeMainKw contained prepare cellmanager potential integrator
+syn keyword lpplugcodeMainKw contained apply property visualize use enduse
 
-"Comments
+syn keyword lpplugcodePlugKw contained file open start end each average cutoff
+syn keyword lpplugcodePlugKw contained input output from to sigma epsilon rcut
+syn keyword lpplugcodePlugKw contained dt
+
+"------------------------------------------------------------"
+" Regions in control files                                   "
+"------------------------------------------------------------"
+
+syn region lpplugcodePlugBlock start="use" end="enduse" fold contains=lpplugcodePlugKw,lpplugcodeNumber
+
+syn match lpplugcodeNoPlug /^[^use]/ contains=lpplugcodeMainKw
+
+"------------------------------------------------------------"
+" Comments for control files                                 "
+"------------------------------------------------------------"
+
 syn keyword lpplugcodeTodo contained TODO FIXME XXX NOTE
-syn match lpplugcodeComment "//.*$" contains=plugcodeTodo
+syn match lpplugcodeComment "#.*$" contains=lpplugcodeTodo
 
-"----------------------------------------------------------------------------/
-"  Setup syntax highlighting
-"----------------------------------------------------------------------------/
+"------------------------------------------------------------"
+" Setup syntax highlighting                                  "
+"------------------------------------------------------------"
 
-let b:current_syntax = "plugcode"
+" Define the default highlighting.
+" For version 5.7 and earlier: only when not done already
+" For version 5.8 and later: only when an item doesn't have highlighting yet
+if version >= 508 || !exists("did_bib_syn_inits")
+  if version < 508
+    let did_bib_syn_inits = 1
+    command -nargs=+ HiLink hi link <args>
+  else
+    command -nargs=+ HiLink hi def link <args>
+  endif
+  HiLink lpplugcodeTodo        Todo
+  HiLink lpplugcodeComment     Comment
+  HiLink lpplugcodePlugBlock   Statement
+  HiLink lpplugcodeMainKw      Keyword
+  HiLink lpplugcodeNoPlug      SpecialChar
+  HiLink lpplugcodePlugKw      SpecialChar
+  HiLink lpplugcodeString      Constant
+  HiLink lpplugcodeDescString  PreProc
+  HiLink lpplugcodeNumber      Constant
+  delcommand HiLink
+endif
 
-hi def link lpplugcodeTodo          Todo
-hi def link lpplugcodeComment       Comment
-hi def link lpplugcodeStarBlockCmd  Statement
-hi def link lpplugcodeMainKw        Keyword
-hi def link lpplugcodeMainInnerKw   Special
-hi def link lpplugcodeEllOrbitCmd   Statement
-hi def link lpplugcodeHIPNumber     Type
-hi def link lpplugcodeString        Constant
-hi def link lpplugcodeDescString    PreProc
-hi def link lpplugcodeNumber        Constant
+
+let b:current_syntax = "lpplugcode"
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
