@@ -156,9 +156,9 @@ class Language(Item):
                   if includedname not in inc: inc.append(includedname)
                elif remainder.startswith('<') and remainder.endswith('>'):
                   includedname = remainder[1:-1]
-                  if includedname not in inc: 
-                     for d in includedirs: 
-                         if os.path.exists(os.path.join(d, includedname)): inc.append(os.path.join(d, includedname))
+                  if includedname not in inc:
+                     for d in includedirs:
+                         if os.path.exists(os.path.join(d, includedname)): inc.append(os.path.abspath(os.path.join(d, includedname)))
                else: assert False
         return inc
  
