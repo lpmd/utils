@@ -49,13 +49,16 @@ syn keyword lpcontrolPlugKw contained file open start end each average cutoff
 syn keyword lpcontrolPlugKw contained input output from to sigma epsilon rcut
 syn keyword lpcontrolPlugKw contained dt
 
+syn keyword lpcontrolPlugin cubic crystal3d xyz lennardjones beeman minimumimage
+syn keyword lpcontrolPlugin gdr angdist tempscaling
+
 "------------------------------------------------------------"
 " Regions in control files                                   "
 "------------------------------------------------------------"
 
 syn region lpcontrolPlugBlock start="use" end="enduse" fold contains=lpcontrolPlugKw,lpcontrolNumber
 
-syn match lpcontrolNoPlug /^[^use]/ contains=lpcontrolMainKw
+syn match lpcontrolNoPlug /^[^u]/ contains=lpcontrolMainKw
 
 "------------------------------------------------------------"
 " Comments for control files                                 "
@@ -82,10 +85,11 @@ if version >= 508 || !exists("did_bib_syn_inits")
   HiLink lpcontrolComment     Comment
   HiLink lpcontrolPlugBlock   Statement
   HiLink lpcontrolMainKw      Keyword
-  HiLink lpcontrolNoPlug      SpecialChar
+  HiLink lpcontrolPlugin      Identifier
   HiLink lpcontrolPlugKw      SpecialChar
-  HiLink lpcontrolString      Constant
-  HiLink lpcontrolDescString  PreProc
+"  HiLink lpcontrolNoPlug      SpecialChar
+"  HiLink lpcontrolString      Constant
+"  HiLink lpcontrolDescString  PreProc
   HiLink lpcontrolNumber      Constant
   delcommand HiLink
 endif
