@@ -21,6 +21,14 @@ set cpo&vim
 syn case ignore
 
 "------------------------------------------------------------"
+" C highlighting                                             "
+"------------------------------------------------------------"
+
+syn include @CPP syntax/c.vim
+syn region CPPregion matchgroup=Snip start=/{/ end=/}/ contains=@CPP
+hi link Snip SpecialComment
+
+"------------------------------------------------------------"
 " Numerical information for control files                    "
 "------------------------------------------------------------"
 
@@ -41,9 +49,8 @@ syn match lpplugcodeNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 " Keywords control files                                     "
 "------------------------------------------------------------"
 
-syn keyword lpplugcodeMainKw contained cell input output steps monitor average 
-syn keyword lpplugcodeMainKw contained prepare cellmanager potential integrator
-syn keyword lpplugcodeMainKw contained apply property visualize use enduse
+syn keyword lpplugcodeMainKw contained include plugin version author parameter example
+syn keyword lpplugcodeMainKw contained slot end test beforetest aftertest function
 
 syn keyword lpplugcodePlugKw contained file open start end each average cutoff
 syn keyword lpplugcodePlugKw contained input output from to sigma epsilon rcut
@@ -53,9 +60,10 @@ syn keyword lpplugcodePlugKw contained dt
 " Regions in control files                                   "
 "------------------------------------------------------------"
 
-syn region lpplugcodePlugBlock start="use" end="enduse" fold contains=lpplugcodePlugKw,lpplugcodeNumber
+"syn region lpplugcodePlugBlock start="{" end="}" fold contains=lpplugcodePlugKw,lpplugcodeNumber
 
-syn match lpplugcodeNoPlug /^[^use]/ contains=lpplugcodeMainKw
+syn match lpplugcodeNoPlug /^@\w/ contains=lpplugcodeMainKw
+syn match lpplugcodeNoPlug /^[^\s*]@\w/ contains=lpplugcodeMainKw
 
 "------------------------------------------------------------"
 " Comments for control files                                 "
@@ -63,6 +71,7 @@ syn match lpplugcodeNoPlug /^[^use]/ contains=lpplugcodeMainKw
 
 syn keyword lpplugcodeTodo contained TODO FIXME XXX NOTE
 syn match lpplugcodeComment "#.*$" contains=lpplugcodeTodo
+syn match lpplugcodeComment "//.*$" contains=lpplugcodeTodo
 
 "------------------------------------------------------------"
 " Setup syntax highlighting                                  "
