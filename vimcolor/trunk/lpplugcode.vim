@@ -21,14 +21,6 @@ set cpo&vim
 syn case ignore
 
 "------------------------------------------------------------"
-" C highlighting                                             "
-"------------------------------------------------------------"
-
-syn include @CPP syntax/c.vim
-syn region CPPregion matchgroup=Snip start=/{/ end=/}/ contains=@CPP
-"hi link Snip SpecialComment
-
-"------------------------------------------------------------"
 " Numerical information for control files                    "
 "------------------------------------------------------------"
 
@@ -51,11 +43,37 @@ syn match lpplugcodeNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 
 syn keyword lpplugcodeMainKw contained include plugin version author parameter example
 syn keyword lpplugcodeMainKw contained slot end test beforetest aftertest function
-syn keyword lpplugcodeMainKw contained global
+syn keyword lpplugcodeMainKw contained global require
 
 syn keyword lpplugcodePlugKw contained file open start end each average cutoff
 syn keyword lpplugcodePlugKw contained input output from to sigma epsilon rcut
 syn keyword lpplugcodePlugKw contained dt
+
+syn keyword lpplugcodePlCode contained AtomSelection AtomSet RawAtomSet PutTaskValue GetTaskValue
+syn keyword lpplugcodePlCode contained BasicCell Buffer NonOrthogonalCell Cell CellTopology Topology
+syn keyword lpplugcodePlCode contained Vector VectorFormat Dot Cross RawMatrix MatrixFromHeap
+syn keyword lpplugcodePlCode contained ParseIntegerKeyword ParseRealKeyword ParseVectorKeyword
+syn keyword lpplugcodePlCode contained ParseStringKeyword ParseTagKeyword ParseBooleanKeyword Deallocate
+syn keyword lpplugcodePlCode contained EndWithError ShowWarning NotImplemented InvalidOperation RuntimeError
+syn keyword lpplugcodePlCode contained SystemError FileNotFound SyntaxError PluginError InvalidRequest
+syn keyword lpplugcodePlCode contained MissingComponent CutoffTooLarge NonOrthogonalCell OrthogonalCell
+syn keyword lpplugcodePlCode contained AtomData Region ReturnValue Selector RawTag Tag TaskReturnValue
+syn keyword lpplugcodePlCode contained SetValue GetValue Timer Topolgy ToString GenericVector
+syn keyword lpplugcodePlCode contained LogMessage GetArrays Get ArraysByName AddAtom
+syn keyword lpplugcodePlCode contained GetArray SetArrays LocalSize ExtendedLocalSize 
+syn keyword lpplugcodePlCode contained TotalSize GetTotalArray ReturnValue GetNeighborList
+syn keyword lpplugcodePlCode contained GetCenterOfMass Rank NumberOfRanks AtomBelongsToRank
+syn keyword lpplugcodePlCode contained OrthoDistance GetLocalCell GetCartesian GetFractional
+syn keyword lpplugcodePlCode contained Initialize Destroy HasTag SetTag UnsetTag VectorFormat
+
+
+syn keyword lpplugcodeASetCd contained ASet_LogMessage ASet_GetArrays ASet_Get ArraysByName ASet_AddAtom
+syn keyword lpplugcodeASetCd contained ASet_GetArray ASet_SetArrays ASet_LocalSize ASet_ExtendedLocalSize 
+syn keyword lpplugcodeASetCd contained ASet_TotalSize ASet_GetTotalArray ASet_ReturnValue ASet_GetNeighborList
+syn keyword lpplugcodeASetCd contained ASet_GetCenterOfMass ASet_Rank ASet_NumberOfRanks Cell_AtomBelongsToRank
+syn keyword lpplugcodeASetCd contained Cell_OrthoDistance Cell_GetLocalCell Cell_GetCartesian Cell_GetFractional
+syn keyword lpplugcodeASetCd contained Matrix_Initialize Matrix_Destroy HasTag SetTag UnsetTag
+
 
 "------------------------------------------------------------"
 " Regions in control files                                   "
@@ -73,6 +91,15 @@ syn match lpplugcodeNoPlug /^[^\s*]@\w/ contains=lpplugcodeMainKw
 syn keyword lpplugcodeTodo contained TODO FIXME XXX NOTE
 syn match lpplugcodeComment "#.*$" contains=lpplugcodeTodo
 syn match lpplugcodeComment "//.*$" contains=lpplugcodeTodo
+
+"------------------------------------------------------------"
+" C highlighting                                             "
+"------------------------------------------------------------"
+
+syn include @C syntax/c.vim
+syn include @CPP syntax/cpp.vim
+syn region Cregion matchgroup=Snip start=/{/ end=/}/ contains=@C,@CPP,lpplugcodePlCode
+"hi link Snip SpecialComment
 
 "------------------------------------------------------------"
 " Setup syntax highlighting                                  "
@@ -95,6 +122,7 @@ if version >= 508 || !exists("did_bib_syn_inits")
   HiLink lpplugcodeNoPlug      SpecialChar
   HiLink lpplugcodePlugKw      SpecialChar
   HiLink lpplugcodeString      Constant
+  HiLink lpplugcodePlCode      Identifier
   HiLink lpplugcodeDescString  PreProc
   HiLink lpplugcodeNumber      Constant
   HiLink Snip                  SpecialComment
