@@ -26,7 +26,7 @@ syn case ignore
 
 syn include @CPP syntax/c.vim
 syn region CPPregion matchgroup=Snip start=/{/ end=/}/ contains=@CPP
-hi link Snip SpecialComment
+"hi link Snip SpecialComment
 
 "------------------------------------------------------------"
 " Numerical information for control files                    "
@@ -51,6 +51,7 @@ syn match lpplugcodeNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 
 syn keyword lpplugcodeMainKw contained include plugin version author parameter example
 syn keyword lpplugcodeMainKw contained slot end test beforetest aftertest function
+syn keyword lpplugcodeMainKw contained global
 
 syn keyword lpplugcodePlugKw contained file open start end each average cutoff
 syn keyword lpplugcodePlugKw contained input output from to sigma epsilon rcut
@@ -96,6 +97,7 @@ if version >= 508 || !exists("did_bib_syn_inits")
   HiLink lpplugcodeString      Constant
   HiLink lpplugcodeDescString  PreProc
   HiLink lpplugcodeNumber      Constant
+  HiLink Snip                  SpecialComment
   delcommand HiLink
 endif
 

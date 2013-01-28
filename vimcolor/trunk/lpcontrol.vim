@@ -44,13 +44,29 @@ syn match lpcontrolNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 syn keyword lpcontrolMainKw contained cell input output steps monitor average 
 syn keyword lpcontrolMainKw contained prepare cellmanager potential integrator
 syn keyword lpcontrolMainKw contained apply property visualize use enduse
+syn keyword lpcontrolMainKw contained set filter periodic
 
 syn keyword lpcontrolPlugKw contained file open start end each average cutoff
 syn keyword lpcontrolPlugKw contained input output from to sigma epsilon rcut
-syn keyword lpcontrolPlugKw contained dt
+syn keyword lpcontrolPlugKw contained dt axis bins range module nx ny nz key
+syn keyword lpcontrolPlugKw contained value tag velocity color mode quality properties paused
+syn keyword lpcontrolPlugKw contained azimuth zenith
+syn match lpcontrolPlugKw contained ' \w '
 
-syn keyword lpcontrolPlugin cubic crystal3d xyz lennardjones beeman minimumimage
-syn keyword lpcontrolPlugin gdr angdist tempscaling
+syn keyword lpcontrolPlugin addvelocity angdist angularmomentum atomenergy atomtrail average
+syn keyword lpcontrolPlugin beeman berendsen box buckingham
+syn keyword lpcontrolPlugin cellscaling centrosymmetry cna cone constantforce cordnum cordnumfunc
+syn keyword lpcontrolPlugin crystal2d crystal3d crystal cylinder density densityprofile displace
+syn keyword lpcontrolPlugin dlpoly element euler ewald external fastlj finnissinclair finnissinclair-ext
+syn keyword lpcontrolPlugin gdr gupta harmonic index lcbinary leapfrog lennardjones lennardjonesMod
+syn keyword lpcontrolPlugin linkedcell localpressire lpmd mcy metropolis minimumimage mol2 moleculecm
+syn keyword lpcontrolPlugin monitor morse msd nosehoover null osciforce pairdistance pdb pinatoms
+syn keyword lpcontrolPlugin printatoms propertycolor quenchedmd random rawbinary replicate rotate
+syn keyword lpcontrolPlugin rvcorr setcolor settag setvelocity shear simplebond sitecoord skewstart
+syn keyword lpcontrolPlugin sphere suttonchen tabulatedpair tag temperature tempprofile tempscaling test
+syn keyword lpcontrolPlugin undopbc vacf varstep vasp veldist velocityverlet verlet verletlist voronoi
+syn keyword lpcontrolPlugin xyz
+syn keyword lpcontrolPlugin cubic centeratoms fcc
 
 "------------------------------------------------------------"
 " Regions in control files                                   "
