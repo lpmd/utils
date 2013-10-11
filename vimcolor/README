@@ -1,0 +1,32 @@
+INSTALL
+=======
+
+To the fans of vim, you can use the .vim files to write lpmd control file using colors. It is the first version available.
+
+1. First step, set the filetypes. 
+
+You will need also create the file 'filetype.vim' in the folder 
+
+~/.vim/
+
+folder, and write these lines:
+
+" The lpmd plugcode format
+au BufRead,BufNewFile *.plugcode setfiletype lpplugcode
+au BufRead,BufNewFile *.control setfiletype lpcontrol
+
+
+2.- Install the files.
+
+To use this, copy the *.vim file to your personal syntax styles directory:
+
+cp *.vim ~/.vim/syntax/
+
+If you don't have you can create one.
+
+lpcontrol.vim : Edit control files with colors in vim.
+lplugcode.com : Edit plugcode files with colors in vim.
+
+3.- Enjoy
+
+Now you can use the vim to edit .control and .plugcode files with color enhancements.
