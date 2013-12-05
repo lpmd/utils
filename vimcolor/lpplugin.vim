@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language: LPMD control file code
+" Language: LPMD control plugin embedded settings
 " Maintainer: GNM <gnm@gnm.cl>
 " Filename: *.control
 " Latest Revision: September 24th 2012
@@ -41,39 +41,15 @@ syn match lpcontrolNumber '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 " Keywords control files                                     "
 "------------------------------------------------------------"
 
-syn keyword lpcontrolMainKw cell input output steps monitor average 
-syn keyword lpcontrolMainKw prepare cellmanager potential integrator
-syn keyword lpcontrolMainKw apply property visualize set filter periodic monitor
-
-syn keyword lpcontrolBlock use enduse
-
-syn keyword lpcontrolInside start end each module symbol nx ny nz file a b c angle
-
-syn keyword lpcontrolPlugin addvelocity angdist angularmomentum atomenergy atomtrail average
-syn keyword lpcontrolPlugin beeman berendsen box buckingham
-syn keyword lpcontrolPlugin cellscaling centrosymmetry cna cone constantforce cordnum cordnumfunc
-syn keyword lpcontrolPlugin crystal2d crystal3d crystal cylinder density densityprofile displace
-syn keyword lpcontrolPlugin dlpoly element euler ewald external fastlj finnissinclair finnissinclair-ext
-syn keyword lpcontrolPlugin gdr gupta harmonic index lcbinary leapfrog lennardjones lennardjonesMod
-syn keyword lpcontrolPlugin linkedcell localpressire lpmd mcy metropolis minimumimage mol2 moleculecm
-syn keyword lpcontrolPlugin morse msd nosehoover null osciforce pairdistance pdb pinatoms
-syn keyword lpcontrolPlugin printatoms propertycolor quenchedmd random rawbinary replicate rotate
-syn keyword lpcontrolPlugin rvcorr setcolor settag setvelocity shear simplebond sitecoord skewstart
-syn keyword lpcontrolPlugin sphere suttonchen tabulatedpair tag temperature tempprofile tempscaling test
-syn keyword lpcontrolPlugin undopbc vacf varstep vasp veldist velocityverlet verlet verletlist voronoi
-syn keyword lpcontrolPlugin xyz
-syn keyword lpcontrolPlugin cubic centeratoms fcc
+syn keyword lpcontrolPlugKw file open start end each average cutoff a b c
+syn keyword lpcontrolPlugKw input output from to sigma epsilon rcut
+syn keyword lpcontrolPlugKw dt axis bins range module nx ny nz key
+syn keyword lpcontrolPlugKw value tag velocity color mode quality properties paused
+syn keyword lpcontrolPlugKw azimuth zenith
 
 "------------------------------------------------------------"
 " Regions in control files                                   "
 "------------------------------------------------------------"
-
-"syn match lpcontrolNoPlug /^[^u].*$/ contains=lpcontrolNumber,lpcontrolMainKw,lpcontrolInside
-"syn match lpcontrolNoPlug /^*/ contains=lpcontrolNumber,lpcontrolMainKw,lpcontrolInside
-
-"syn match PlugBlock "((\_.\{-}:" contains=lpcontrolPlugKw
-"syn region lpcontrolPlugBlock matchgroup=Block start="use" end="enduse" contains=lpcontrolPlugKw
-"syn region lpcontrolPlugBlock2 start=/{/ end=/}/ contains=lpcontrolPlugKw 
 
 "------------------------------------------------------------"
 " Comments for control files                                 "
@@ -96,22 +72,13 @@ if version >= 508 || !exists("did_bib_syn_inits")
   else
     command -nargs=+ HiLink hi def link <args>
   endif
-  HiLink lpcontrolTodo        Todo
-  HiLink lpcontrolComment     Comment
-  HiLink lpcontrolPlugBlock   Statement
-  HiLink lpcontrolMainKw      Keyword
-  HiLink lpcontrolPlugin      Identifier
-"  HiLink lpcontrolPlugBlock2  Statement
-"  HiLink lpcontrolInside      SpecialChar
-"  HiLink lpcontrolNoPlug      SpecialChar
-"  HiLink lpcontrolString      Constant
-"  HiLink lpcontrolDescString  PreProc
+  HiLink lpcontrolPlugKw      SpecialChar
   HiLink lpcontrolNumber      Constant
   delcommand HiLink
 endif
 
 
-let b:current_syntax = "lpcontrol"
+let b:current_syntax = "lpplugin"
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
