@@ -41,11 +41,11 @@ syn match lpcontrolNumber '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 " Keywords control files                                     "
 "------------------------------------------------------------"
 
-syn keyword lpcontrolPlugKw file open start end each average cutoff a b c
+syn keyword lpcontrolPlugKw file open start end each average cutoff a b c d c0 c1 c2
 syn keyword lpcontrolPlugKw input output from to sigma epsilon rcut
 syn keyword lpcontrolPlugKw dt axis bins range module nx ny nz key
 syn keyword lpcontrolPlugKw value tag velocity color mode quality properties paused
-syn keyword lpcontrolPlugKw azimuth zenith
+syn keyword lpcontrolPlugKw azimuth zenith 
 
 "------------------------------------------------------------"
 " Regions in control files                                   "
