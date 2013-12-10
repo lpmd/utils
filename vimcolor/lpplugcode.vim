@@ -43,7 +43,7 @@ syn match lpplugcodeNumber contained '\d[[:digit:]]*\.\d*[eE][\-+]\=\d\+'
 
 syn keyword lpplugcodeMainKw contained include plugin version author parameter example
 syn keyword lpplugcodeMainKw contained slot end test beforetest aftertest function
-syn keyword lpplugcodeMainKw contained global require
+syn keyword lpplugcodeMainKw contained global require define
 
 syn keyword lpplugcodePlugKw contained file open start end each average cutoff
 syn keyword lpplugcodePlugKw contained input output from to sigma epsilon rcut
@@ -65,6 +65,7 @@ syn keyword lpplugcodePlCode contained TotalSize GetTotalArray ReturnValue GetNe
 syn keyword lpplugcodePlCode contained GetCenterOfMass Rank NumberOfRanks AtomBelongsToRank
 syn keyword lpplugcodePlCode contained OrthoDistance GetLocalCell GetCartesian GetFractional
 syn keyword lpplugcodePlCode contained Initialize Destroy HasTag SetTag UnsetTag VectorFormat
+syn keyword lpplugcodePlCode contained VectorLoop
 
 
 syn keyword lpplugcodeASetCd contained ASet_LogMessage ASet_GetArrays ASet_Get ArraysByName ASet_AddAtom
